@@ -1,3 +1,7 @@
 flask 
 gunicorn 
 groq
+twilio
+stripe
+requests
+python-dotenv
