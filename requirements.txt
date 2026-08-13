@@ -1,3 +1,6 @@
 flask 
 gunicorn 
 groq
+twilio
+stripe 
+requests
