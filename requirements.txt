@@ -4,3 +4,4 @@ groq
 twilio
 stripe 
 requests
+python-dotenv
