@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Care Solution AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.35);
+            --border-color: rgba(6, 182, 212, 0.25);
+            --status-green: #10b981;
+            --status-red: #ef4444;
+            --status-yellow: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* HEADER & NAVBAR */
+        header {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .brand-logo span { color: var(--accent-cyan); }
+
+        nav ul { display: flex; list-style: none; gap: 20px; align-items: center; }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 8px;
+        }
+
+        nav button:hover, nav button.active {
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        /* MAIN CONTAINER & TABS */
+        main {
+            flex: 1;
+            max-width: 1350px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 40px 20px;
+        }
+
+        .tab-content { display: none; flex-direction: column; gap: 30px; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* DASHBOARD GRID SUPERIORE (FACCINA AI + APPUNTAMENTI OGGI) */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        /* CARD APPUNTAMENTI OGGI */
+        .today-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .today-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .today-item:last-child { border-bottom: none; }
+        .time-badge { color: var(--accent-cyan); font-weight: 800; font-size: 0.9rem; }
+        .patient-name { font-weight: 600; margin-top: 4px; }
+        .treatment-type { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* SEZIONE FACCINA AI (HERO SECTION) */
+        .hero-section {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: radial-gradient(circle at center, rgba(6, 182, 212, 0.08) 0%, transparent 70%);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            height: 100%;
+        }
+
+        .ai-face {
+            width: 160px; height: 160px;
+            background-color: #000000;
+            border: 3px solid var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 35px var(--accent-glow);
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 0 32px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .eye {
+            width: 24px; height: 42px;
+            background-color: var(--accent-cyan);
+            border-radius: 14px;
+            box-shadow: 0 0 15px var(--accent-cyan);
+            transition: transform 0.12s ease-out, height 0.08s ease-in-out;
+        }
+
+        .eye.blink { height: 2px !important; }
+        .ai-greeting { font-size: 1.3rem; font-weight: 800; min-height: 60px; }
+
+        /* CARD GENERALI */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            width: 100%;
+        }
+
+        .card-header { font-size: 1.2rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+        /* TABELLA REGISTRO PAZIENTI WHATSAPP */
+        .patient-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .patient-table th {
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .patient-table td {
+            padding: 14px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .patient-table tr:last-child td { border-bottom: none; }
+
+        /* GRIGLIA 3 COLONNE PER "CHI SIAMO" */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-3 { grid-template-columns: 1fr; }
+            .dashboard-layout { grid-template-columns: 1fr; }
+        }
+
+        /* AGENDA LIST */
+        .agenda-list { display: flex; flex-direction: column; gap: 15px; }
+        .agenda-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1.5fr 1fr 1fr;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--status-green);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .agenda-row.rinviato { border-left-color: var(--status-yellow); }
+        .agenda-row.disdetto { border-left-color: var(--status-red); opacity: 0.8; }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            display: inline-block;
+        }
+        .status-badge.verde { background: rgba(16, 185, 129, 0.15); color: var(--status-green); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-badge.giallo { background: rgba(245, 158, 11, 0.15); color: var(--status-yellow); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .status-badge.rosso { background: rgba(239, 68, 68, 0.15); color: var(--status-red); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        /* FORM CONTROLLI */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            color: white;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+
+        /* FOOTER */
+        footer {
+            background-color: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            padding: 25px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="brand-logo">
+            <i class="fa-solid fa-tooth"></i> Dental Care Solution <span>AI</span>
+        </a>
+        <nav>
+            <ul>
+                <li><button onclick="switchTab('dashboard')" class="active" id="btn-dashboard"><i class="fa-solid fa-house"></i> Dashboard</button></li>
+                <li><button onclick="switchTab('agenda')" id="btn-agenda"><i class="fa-solid fa-calendar-days"></i> Agenda</button></li>
+                <li><button onclick="switchTab('cassa')" id="btn-cassa"><i class="fa-solid fa-wallet"></i> Cassa & Pazienti</button></li>
+                <li><button onclick="switchTab('analisi')" id="btn-analisi"><i class="fa-solid fa-shield-halved"></i> Analisi & Sicurezza</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="dashboard" class="tab-content active">
+            
+            <div class="dashboard-layout">
+                <div class="today-card">
+                    <h3 style="color: var(--accent-cyan); font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-regular fa-clock"></i> Appuntamenti di Oggi
+                    </h3>
+                    <div class="today-item">
+                        <div class="time-badge">11:00</div>
+                        <div class="patient-name">Giulia Verdi</div>
+                        <div class="treatment-type">Sbiancamento LED</div>
+                    </div>
+                    <div class="today-item">
+                        <div class="time-badge">15:15</div>
+                        <div class="patient-name">Lucia Ferri</div>
+                        <div class="treatment-type">Controllo apparecchio</div>
+                    </div>
+                    <button onclick="switchTab('agenda')" style="margin-top: auto; background: none; border: 1px solid var(--border-color); color: var(--accent-cyan); padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Vedi tutta l'Agenda <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="hero-section">
+                    <div class="ai-face">
+                        <div class="eye" id="left-eye"></div>
+                        <div class="eye" id="right-eye"></div>
+                    </div>
+                    <h1 class="ai-greeting" id="greeting-text">Caricamento AI...</h1>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> Bot WhatsApp Integrato & Registro Pazienti</div>
+                <table class="patient-table">
+                    <thead>
+                        <tr>
+                            <th>Paziente</th>
+                            <th>Telefono</th>
+                            <th>Motivo Visita</th>
+                            <th>Data / Ora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Giuseppe Verdi</strong></td>
+                            <td style="color: var(--text-muted); font-size: 0.8rem;">whatsapp:+393270315651</td>
+                            <td>Pulizia dei denti</td>
+                            <td style="color: var(--accent-cyan);">Domani 15:00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Andrea Bernardini</strong></td>
+                            <td style="color: var(--text-muted); font-size: 0.8rem;">whatsapp:+393270315651</td>
+                            <td>Sbiancamento dentale</td>
+                            <td style="color: var(--accent-cyan);">Oggi 15:15</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gaia Golden</strong></td>
+                            <td style="color: var(--text-muted); font-size: 0.8rem;">whatsapp:+393270315651</td>
+                            <td>Rimozione carie</td>
+                            <td style="color: var(--accent-cyan);">Domani 11:00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><i class="fa-solid fa-circle-info"></i> Chi Siamo & Cosa Facciamo</div>
+                <div class="grid-3">
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 18px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                        <h4 style="margin: 0 0 8px 0; color: var(--accent-cyan); font-size: 1rem;">Cosa facciamo?</h4>
+                        <p style="margin: 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.5;">
+                            Digitalizziamo e automatizziamo l'intero flusso gestionale dello studio: dall'accoglienza del paziente al tracciamento dei pagamenti.
+                        </p>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 18px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                        <h4 style="margin: 0 0 8px 0; color: var(--accent-cyan); font-size: 1rem;">Come lo facciamo?</h4>
+                        <p style="margin: 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.5;">
+                            Integrando l'Intelligenza Artificiale Groq con il canale WhatsApp ufficiale Twilio e il gestionale dello studio.
+                        </p>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.03); padding: 18px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                        <h4 style="margin: 0 0 8px 0; color: var(--accent-cyan); font-size: 1rem;">Perché sceglierci?</h4>
+                        <p style="margin: 0; color: var(--text-muted); font-size: 0.88rem; line-height: 1.5;">
+                            Zero attese telefoniche per i pazienti, agenda sempre aggiornata in tempo reale e sgravio totale della segreteria.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="agenda" class="tab-content">
+            <div class="card">
+                <div class="card-header" style="justify-content: space-between;">
+                    <span><i class="fa-solid fa-calendar-days"></i> Gestione Agenda Completa</span>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 400;"><i class="fa-brands fa-whatsapp"></i> Twilio Live Feed</span>
+                </div>
+                
+                <div class="agenda-list">
+                    <div style="display: grid; grid-template-columns: 1fr 2fr 1.5fr 1fr 1fr; padding: 0 16px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">
+                        <div>Data / Ora</div>
+                        <div>Paziente & Dettagli</div>
+                        <div>Problema / Terapia</div>
+                        <div>Costo Prev.</div>
+                        <div>Stato</div>
+                    </div>
+
+                    <div class="agenda-row">
+                        <div style="font-weight: 700;">Oggi<br><span style="color: var(--accent-cyan); font-size: 1.1rem;">11:00</span></div>
+                        <div><strong>Marco Bianchi</strong><div style="font-size: 0.8rem; color: var(--text-muted);">Maschio, 11 anni</div></div>
+                        <div>Prima visita + Igiene</div>
+                        <div style="font-weight: bold;">€ 80,00</div>
+                        <div><span class="status-badge verde">Confermato</span></div>
+                    </div>
+
+                    <div class="agenda-row">
+                        <div style="font-weight: 700;">Oggi<br><span style="color: var(--accent-cyan); font-size: 1.1rem;">15:15</span></div>
+                        <div><strong>Giulia Verdi</strong><div style="font-size: 0.8rem; color: var(--text-muted);">Femmina, 34 anni</div></div>
+                        <div>Sbiancamento Arcata</div>
+                        <div style="font-weight: bold;">€ 250,00</div>
+                        <div><span class="status-badge verde">Confermato</span></div>
+                    </div>
+
+                    <div class="agenda-row rinviato">
+                        <div style="font-weight: 700;">Domani<br><span style="color: var(--accent-cyan); font-size: 1.1rem;">10:00</span></div>
+                        <div><strong>Antonio Russo</strong><div style="font-size: 0.8rem; color: var(--text-muted);">Maschio, 55 anni</div></div>
+                        <div>Impianto (Seduta 2)</div>
+                        <div style="font-weight: bold;">€ 450,00</div>
+                        <div><span class="status-badge giallo">Rinviato</span></div>
+                    </div>
+
+                    <div class="agenda-row disdetto">
+                        <div style="font-weight: 700;">Giovedì<br><span style="color: var(--accent-cyan); font-size: 1.1rem;">17:30</span></div>
+                        <div><strong>Sofia Lenti</strong><div style="font-size: 0.8rem; color: var(--text-muted);">Femmina, 28 anni</div></div>
+                        <div>Estrazione Dente Giudizio</div>
+                        <div style="font-weight: bold; text-decoration: line-through; color: var(--status-red);">€ 120,00</div>
+                        <div><span class="status-badge rosso">Disdetto</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cassa" class="tab-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-user-plus"></i> Inserimento Manuale in Sede</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Registra manualmente un paziente o un trattamento direttamente dallo studio.</p>
+                    <div class="form-group">
+                        <label>Nome, Cognome e Dati (es. Età)</label>
+                        <input type="text" placeholder="Es. Luca Rossi (42 anni)">
+                    </div>
+                    <div class="form-group">
+                        <label>Problema / Trattamento</label>
+                        <input type="text" placeholder="Es. Carie profonda">
+                    </div>
+                    <button class="btn-primary">Registra in Agenda</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><i class="fa-brands fa-stripe"></i> Pagamento Rapido (Stripe)</div>
+                    <div class="form-group">
+                        <label>Seleziona Paziente (dal Database)</label>
+                        <input type="text" placeholder="Cerca paziente...">
+                    </div>
+                    <div class="form-group">
+                        <label>Importo Finale (€)</label>
+                        <input type="number" placeholder="0.00">
+                    </div>
+                    <button class="btn-primary"><i class="fa-solid fa-credit-card"></i> Avvia Checkout Stripe</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="analisi" class="tab-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-chart-line"></i> Resoconto Economico</div>
+                    <div style="margin-bottom: 20px;">
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">Incasso Mensile</span>
+                        <div style="font-size: 2.5rem; font-weight: 800; color: white;" id="live-revenue">€ 0.00</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 15px; font-size: 0.9rem;">
+                        <span>Transazioni Stripe: <strong id="tx-count">0</strong></span>
+                        <span style="color: var(--status-green); font-weight: bold;"><i class="fa-solid fa-arrow-up"></i> +12% vs mese scorso</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><i class="fa-solid fa-shield-halved"></i> Stato Sicurezza Rete</div>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <span><i class="fa-solid fa-lock" style="color: var(--accent-cyan);"></i> Crittografia SSL</span>
+                            <span style="color: #10b981; font-weight: bold;">Attiva 256-bit</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="fa-solid fa-server" style="color: var(--accent-cyan);"></i> Stripe Webhook Gateway</span>
+                            <span style="color: #10b981; font-weight: bold;">In Ascolto</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p><strong>Assistenza Diretta:</strong> In attesa di numero... &nbsp;|&nbsp; <strong>Email Ufficiale:</strong> In attesa di email...</p>
+        <p style="margin-top: 5px; font-size: 0.8rem;">&copy; 2026 Dental Care Solution AI. P.IVA in aggiornamento.</p>
+    </footer>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+
+        const leftEye = document.getElementById('left-eye');
+        const rightEye = document.getElementById('right-eye');
+
+        function moveEyes() {
+            const x = (Math.random() - 0.5) * 20;
+            const y = (Math.random() - 0.5) * 12;
+            leftEye.style.transform = `translate(${x}px, ${y}px)`;
+            rightEye.style.transform = `translate(${x}px, ${y}px)`;
+            setTimeout(moveEyes, Math.random() * 2000 + 500);
+        }
+
+        function blink() {
+            leftEye.classList.add('blink');
+            rightEye.classList.add('blink');
+            setTimeout(() => {
+                leftEye.classList.remove('blink');
+                rightEye.classList.remove('blink');
+            }, 120);
+            setTimeout(blink, Math.random() * 4500 + 1500);
+        }
+
+        moveEyes();
+        blink();
+
+        const greetings = [
+            "Ehi Dottore, come va oggi?",
+            "Dottore, ci sono 3 appuntamenti in attesa.",
+            "Sistemi operativi. Pronti per le visite?",
+            "Buongiorno! Bot WhatsApp sincronizzato.",
+            "Database allineato. Buona giornata Doc!"
+        ];
+        document.getElementById('greeting-text').innerText = greetings[Math.floor(Math.random() * greetings.length)];
+
+        setInterval(() => {
+            fetch('/api/live-stats')
+                .then(res => res.json())
+                .then(data => {
+                    const rev = document.getElementById('live-revenue');
+                    const tx = document.getElementById('tx-count');
+                    if (rev) rev.innerText = '€ ' + data.revenue.toLocaleString('it-IT', {minimumFractionDigits: 2});
+                    if (tx) tx.innerText = data.transactions;
+                }).catch(() => {});
+        }, 5000);
+    </script>
+</body>
+</html>
