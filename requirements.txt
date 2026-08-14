@@ -5,3 +5,4 @@ twilio
 stripe
 requests
 python-dotenv
+flask-cors
