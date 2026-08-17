@@ -3,6 +3,10 @@ import json
 import threading
 # import ngrok
 from flask import Flask, request, jsonify, render_template
+app = Flask(__name__)
+@app.route('/')
+def home():
+    return render_template('index.html')
 from flask import jsonify 
 from groq import Groq
 from twilio.twiml.messaging_response import MessagingResponse
