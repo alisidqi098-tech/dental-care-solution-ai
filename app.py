@@ -2,7 +2,7 @@ import os
 import json
 import threading
 # import ngrok
-from flask import Flask, requests, jsonify, render_template
+from flask import Flask, request, jsonify, render_template
 from flask import jsonify 
 from groq import Groq
 from twilio.twiml.messaging_response import MessagingResponse
